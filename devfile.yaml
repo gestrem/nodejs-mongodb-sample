@@ -1,0 +1,74 @@
+metadata:
+  name: nodejs-mongo-officehours
+projects:
+  - name: nodejs-mongodb-sample
+    source:
+      location: https://github.com/Red-Wine-Software/nodejs-mongodb-sample.git
+      type: git
+components:
+  - id: che-incubator/typescript/latest
+    memoryLimit: 512Mi
+    type: chePlugin
+  - id: ms-vscode/node-debug2/latest
+    type: chePlugin
+  - mountSources: true
+    endpoints:
+      - name: nodejs
+        port: 8080
+    memoryLimit: 512Mi
+    type: dockerimage
+    image: >-
+      registry.redhat.io/codeready-workspaces/plugin-java8-rhel8@sha256:b6e36406e7f8ff86f462f370f55143446ceb0c555b86b13593436f5e71b7cab1
+    alias: nodejs
+    env:
+      - value: 220fd770-c028-480d-8f95-f84353c7d55a
+        name: SECRET
+      - value: production
+        name: NODE_ENV
+  - endpoints:
+      - name: mongodb
+        port: 27017
+        attributes:
+          discoverable: 'true'
+          public: 'false'
+    memoryLimit: 512Mi
+    type: dockerimage
+    volumes:
+      - name: mongo-storage
+        containerPath: /var/lib/mongodb/data
+    image: >-
+      registry.redhat.io/rhscl/mongodb-36-rhel7@sha256:9f799d356d7d2e442bde9d401b720600fd9059a3d8eefea6f3b2ffa721c0dc73
+    alias: mongo
+    env:
+      - value: user
+        name: MONGODB_USER
+      - value: password
+        name: MONGODB_PASSWORD
+      - value: guestbook
+        name: MONGODB_DATABASE
+      - value: password
+        name: MONGODB_ADMIN_PASSWORD
+  - id: redhat/vscode-openshift-connector/latest
+    type: chePlugin
+apiVersion: 1.0.0
+commands:
+  - name: 1. Run the application
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/nodejs-mongodb-sample'
+        type: exec
+        command: npm install && node --inspect=9229 app.js
+        component: nodejs
+  - name: Debug remote node application
+    actions:
+      - referenceContent: |
+          {
+          "version": "0.2.0",
+          "configurations": [
+            {
+              "type": "node",
+              "name": "Debug (Attach) - Remote",
+              "request": "attach",
+              "port": 9229
+            }]
+          }
+        type: vscode-launch
