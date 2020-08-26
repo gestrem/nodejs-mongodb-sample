@@ -1,5 +1,5 @@
 metadata:
-  name: nodejs-mongo-officehours
+  name: nodejs-mongo-tdconline
 projects:
   - name: nodejs-mongodb-sample
     source:
