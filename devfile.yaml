@@ -48,8 +48,6 @@ components:
         name: MONGODB_DATABASE
       - value: password
         name: MONGODB_ADMIN_PASSWORD
-  - id: redhat/vscode-openshift-connector/latest
-    type: chePlugin
 apiVersion: 1.0.0
 commands:
   - name: 1. Run the application
